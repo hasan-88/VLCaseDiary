@@ -1,4 +1,4 @@
-// app/(tabs)/cases.tsx - Modern Cases Screen
+// app/(tabs)/cases.tsx - Updated with "disposed" status
 import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
@@ -43,7 +43,7 @@ interface Case {
   courtName: string;
   partyName: string;
   respondent: string;
-  status: "pending" | "completed" | "hearing";
+  status: "pending" | "disposed" | "hearing";
   nextHearing: string;
   createdAt: string;
 }
@@ -139,7 +139,7 @@ export default function CasesScreen() {
     switch (status) {
       case "pending":
         return Clock;
-      case "completed":
+      case "disposed":
         return CheckCircle;
       case "hearing":
         return Scale;
@@ -299,8 +299,8 @@ export default function CasesScreen() {
               <Text style={styles.statLabel}>Hearing</Text>
             </View>
             <View style={styles.statCard}>
-              <Text style={styles.statNumber}>{getStatCount("completed")}</Text>
-              <Text style={styles.statLabel}>Completed</Text>
+              <Text style={styles.statNumber}>{getStatCount("disposed")}</Text>
+              <Text style={styles.statLabel}>Disposed</Text>
             </View>
           </View>
         </Animated.View>
@@ -323,7 +323,7 @@ export default function CasesScreen() {
           <Filter size={16} color={Colors.text.secondary} />
           <Text style={styles.filterLabel}>Filter:</Text>
           <View style={styles.filterChips}>
-            {["all", "pending", "hearing", "completed"].map((status) => (
+            {["all", "pending", "hearing", "disposed"].map((status) => (
               <TouchableOpacity
                 key={status}
                 style={[

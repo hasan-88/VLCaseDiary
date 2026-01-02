@@ -63,7 +63,9 @@ export const Colors = {
   },
 
   status: {
-    hearing: "#f59e0b",
+    pending: "#f59e0b", // Yellow/Orange for pending
+    hearing: "#f59e0b", // Same as pending for consistency
+    disposed: "#16a34a", // Green for disposed/completed
     default: "#6b7280",
   },
 
@@ -154,12 +156,12 @@ export const Typography = {
     xxxl: 44,
     display: 52,
 
-    // ✅ Multipliers (added here)
+    // Multipliers
     none: 1,
     tight: 1.25,
     snug: 1.375,
     normal: 1.5,
-    relaxed: 1.625, // ✅ Now accessible as Typography.lineHeight.relaxed
+    relaxed: 1.625,
     loose: 2,
   },
 
@@ -186,6 +188,7 @@ export const Typography = {
     widest: 2,
   },
 } as const;
+
 export const Shadows = {
   none: {
     shadowColor: "transparent",
@@ -224,5 +227,5 @@ export const Shadows = {
   },
 } as const;
 
-// ✅ Export alias for Typography (shorthand)
+// Export alias for Typography (shorthand)
 export const t = Typography;

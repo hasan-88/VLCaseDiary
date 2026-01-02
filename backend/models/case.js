@@ -1,3 +1,4 @@
+// models/case.js - Updated with disposed status
 const mongoose = require("mongoose");
 
 const FileItemSchema = new mongoose.Schema(
@@ -44,7 +45,7 @@ const CaseSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["pending", "completed", "hearing"],
+      enum: ["pending", "disposed", "hearing"], // Changed completed to disposed
       default: "pending",
     },
     courtName: {

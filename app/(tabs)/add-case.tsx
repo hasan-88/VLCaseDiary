@@ -1,95 +1,100 @@
-// app/(tabs)/add-case.tsx
-import { Picker } from '@react-native-picker/picker';
-import { useRouter } from 'expo-router';
-import { ArrowLeft, Save } from 'lucide-react-native';
-import React, { useState } from 'react';
+// app/(tabs)/add-case.tsx - Updated with proper dropdowns
+import { Picker } from "@react-native-picker/picker";
+import { useRouter } from "expo-router";
+import { ArrowLeft, Save } from "lucide-react-native";
+import React, { useState } from "react";
 import {
-    ActivityIndicator,
-    Alert,
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View
-} from 'react-native';
-import { casesAPI } from '../../services/api';
+  ActivityIndicator,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { casesAPI } from "../../services/api";
+import {
+  Colors,
+  Spacing,
+  BorderRadius,
+  Typography,
+  Shadows,
+} from "../../constants/theme";
 
 export default function AddCaseScreen() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    title: '',
-    courtName: '',
-    type: '',
-    caseNo: '',
+    title: "",
+    courtName: "",
+    type: "",
+    caseNo: "",
     caseYear: new Date().getFullYear().toString(),
-    onBehalfOf: '',
-    partyName: '',
-    contactNumber: '',
-    respondent: '',
-    lawyer: '',
-    advocateContactNumber: '',
-    adversePartyAdvocateName: '',
-    description: '',
-    nextHearing: new Date().toISOString().split('T')[0],
-    status: 'pending',
+    onBehalfOf: "",
+    partyName: "",
+    contactNumber: "",
+    respondent: "",
+    lawyer: "",
+    advocateContactNumber: "",
+    adversePartyAdvocateName: "",
+    description: "",
+    nextHearing: new Date().toISOString().split("T")[0],
+    status: "pending",
   });
 
   const caseTypes = [
-    'Criminal',
-    'Civil',
-    'Family',
-    'Property',
-    'Corporate',
-    'Labor',
-    'Tax',
-    'Constitutional',
+    "Criminal",
+    "Civil",
+    "Family",
+    "Property",
+    "Corporate",
+    "Labor",
+    "Tax",
+    "Constitutional",
   ];
 
   const onBehalfOfOptions = [
-    'Petitioner',
-    'Respondent',
-    'Complainant',
-    'Accused',
-    'Plaintiff',
-    'DHR',
-    'JDR',
-    'Appellant',
+    "Petitioner",
+    "Respondent",
+    "Complainant",
+    "Accused",
+    "Plaintiff",
+    "DHR",
+    "JDR",
+    "Appellant",
   ];
 
   const handleInputChange = (field: string, value: string) => {
-    console.log('handleInputChange', field, value);
     setFormData((prev) => ({
       ...prev,
       [field]: value,
     }));
   };
 
-  // Android fallback modal selectors for reliable behavior in APKs
-  const [showCaseTypeModal, setShowCaseTypeModal] = useState(false);
-  const [showOnBehalfModal, setShowOnBehalfModal] = useState(false);
-
   const validateForm = () => {
     const required = [
-      'title',
-      'courtName',
-      'type',
-      'caseNo',
-      'caseYear',
-      'onBehalfOf',
-      'partyName',
-      'contactNumber',
-      'respondent',
-      'lawyer',
-      'nextHearing',
+      "title",
+      "courtName",
+      "type",
+      "caseNo",
+      "caseYear",
+      "onBehalfOf",
+      "partyName",
+      "contactNumber",
+      "respondent",
+      "lawyer",
+      "nextHearing",
     ];
 
     for (const field of required) {
       if (!formData[field as keyof typeof formData]) {
-        Alert.alert('Validation Error', `Please fill in ${field.replace(/([A-Z])/g, ' $1').toLowerCase()}`);
+        Alert.alert(
+          "Validation Error",
+          `Please fill in ${field.replace(/([A-Z])/g, " $1").toLowerCase()}`
+        );
         return false;
       }
     }
@@ -103,17 +108,17 @@ export default function AddCaseScreen() {
     try {
       setLoading(true);
       const response = await casesAPI.create(formData);
-      
+
       if (response.success) {
-        Alert.alert('Success', 'Case added successfully', [
+        Alert.alert("Success", "Case added successfully", [
           {
-            text: 'OK',
+            text: "OK",
             onPress: () => router.back(),
           },
         ]);
       }
     } catch (error: any) {
-      Alert.alert('Error', error.message || 'Failed to add case');
+      Alert.alert("Error", error.message || "Failed to add case");
     } finally {
       setLoading(false);
     }
@@ -122,11 +127,11 @@ export default function AddCaseScreen() {
   return (
     <KeyboardAvoidingView
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-          <ArrowLeft size={24} color="#333" />
+          <ArrowLeft size={24} color={Colors.text.primary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Add New Case</Text>
         <View style={{ width: 24 }} />
@@ -146,8 +151,9 @@ export default function AddCaseScreen() {
             <TextInput
               style={styles.input}
               value={formData.title}
-              onChangeText={(value) => handleInputChange('title', value)}
+              onChangeText={(value) => handleInputChange("title", value)}
               placeholder="Enter case title"
+              placeholderTextColor={Colors.text.tertiary}
             />
           </View>
 
@@ -156,8 +162,9 @@ export default function AddCaseScreen() {
             <TextInput
               style={styles.input}
               value={formData.courtName}
-              onChangeText={(value) => handleInputChange('courtName', value)}
+              onChangeText={(value) => handleInputChange("courtName", value)}
               placeholder="Enter court name"
+              placeholderTextColor={Colors.text.tertiary}
             />
           </View>
 
@@ -166,14 +173,23 @@ export default function AddCaseScreen() {
             <View style={styles.pickerContainer}>
               <Picker
                 selectedValue={formData.type}
-                        onValueChange={(value) => handleInputChange('type', value)}
-                        style={styles.picker}
-                        mode={Platform.OS === 'android' ? 'dropdown' : 'dialog'}
-                        enabled={true}
+                onValueChange={(value) => handleInputChange("type", value)}
+                style={styles.picker}
+                mode={Platform.OS === "android" ? "dropdown" : "dialog"}
+                dropdownIconColor="#000"
               >
-                <Picker.Item label="Select Case Type" value="" />
+                <Picker.Item
+                  label="Select Case Type"
+                  value=""
+                  color={Colors.text.tertiary}
+                />
                 {caseTypes.map((type) => (
-                  <Picker.Item key={type} label={type} value={type} />
+                  <Picker.Item
+                    key={type}
+                    label={type}
+                    value={type}
+                    color="#000"
+                  />
                 ))}
               </Picker>
             </View>
@@ -185,8 +201,9 @@ export default function AddCaseScreen() {
               <TextInput
                 style={styles.input}
                 value={formData.caseNo}
-                onChangeText={(value) => handleInputChange('caseNo', value)}
+                onChangeText={(value) => handleInputChange("caseNo", value)}
                 placeholder="e.g., 123/2024"
+                placeholderTextColor={Colors.text.tertiary}
               />
             </View>
 
@@ -195,9 +212,11 @@ export default function AddCaseScreen() {
               <TextInput
                 style={styles.input}
                 value={formData.caseYear}
-                onChangeText={(value) => handleInputChange('caseYear', value)}
+                onChangeText={(value) => handleInputChange("caseYear", value)}
                 keyboardType="numeric"
                 maxLength={4}
+                placeholder="2024"
+                placeholderTextColor={Colors.text.tertiary}
               />
             </View>
           </View>
@@ -207,14 +226,25 @@ export default function AddCaseScreen() {
             <View style={styles.pickerContainer}>
               <Picker
                 selectedValue={formData.onBehalfOf}
-                onValueChange={(value) => handleInputChange('onBehalfOf', value)}
+                onValueChange={(value) =>
+                  handleInputChange("onBehalfOf", value)
+                }
                 style={styles.picker}
-                mode={Platform.OS === 'android' ? 'dropdown' : 'dialog'}
-                enabled={true}
+                mode={Platform.OS === "android" ? "dropdown" : "dialog"}
+                dropdownIconColor="#000"
               >
-                <Picker.Item label="Select Option" value="" />
+                <Picker.Item
+                  label="Select Option"
+                  value=""
+                  color={Colors.text.tertiary}
+                />
                 {onBehalfOfOptions.map((option) => (
-                  <Picker.Item key={option} label={option} value={option} />
+                  <Picker.Item
+                    key={option}
+                    label={option}
+                    value={option}
+                    color="#000"
+                  />
                 ))}
               </Picker>
             </View>
@@ -225,8 +255,9 @@ export default function AddCaseScreen() {
             <TextInput
               style={styles.input}
               value={formData.nextHearing}
-              onChangeText={(value) => handleInputChange('nextHearing', value)}
+              onChangeText={(value) => handleInputChange("nextHearing", value)}
               placeholder="YYYY-MM-DD"
+              placeholderTextColor={Colors.text.tertiary}
             />
           </View>
         </View>
@@ -240,8 +271,9 @@ export default function AddCaseScreen() {
             <TextInput
               style={styles.input}
               value={formData.partyName}
-              onChangeText={(value) => handleInputChange('partyName', value)}
+              onChangeText={(value) => handleInputChange("partyName", value)}
               placeholder="Enter party name"
+              placeholderTextColor={Colors.text.tertiary}
             />
           </View>
 
@@ -250,9 +282,12 @@ export default function AddCaseScreen() {
             <TextInput
               style={styles.input}
               value={formData.contactNumber}
-              onChangeText={(value) => handleInputChange('contactNumber', value)}
+              onChangeText={(value) =>
+                handleInputChange("contactNumber", value)
+              }
               placeholder="Enter contact number"
               keyboardType="phone-pad"
+              placeholderTextColor={Colors.text.tertiary}
             />
           </View>
 
@@ -261,8 +296,9 @@ export default function AddCaseScreen() {
             <TextInput
               style={styles.input}
               value={formData.respondent}
-              onChangeText={(value) => handleInputChange('respondent', value)}
+              onChangeText={(value) => handleInputChange("respondent", value)}
               placeholder="Enter respondent name"
+              placeholderTextColor={Colors.text.tertiary}
             />
           </View>
         </View>
@@ -276,8 +312,9 @@ export default function AddCaseScreen() {
             <TextInput
               style={styles.input}
               value={formData.lawyer}
-              onChangeText={(value) => handleInputChange('lawyer', value)}
+              onChangeText={(value) => handleInputChange("lawyer", value)}
               placeholder="Enter lawyer name"
+              placeholderTextColor={Colors.text.tertiary}
             />
           </View>
 
@@ -287,10 +324,11 @@ export default function AddCaseScreen() {
               style={styles.input}
               value={formData.advocateContactNumber}
               onChangeText={(value) =>
-                handleInputChange('advocateContactNumber', value)
+                handleInputChange("advocateContactNumber", value)
               }
               placeholder="Enter advocate contact"
               keyboardType="phone-pad"
+              placeholderTextColor={Colors.text.tertiary}
             />
           </View>
 
@@ -300,9 +338,10 @@ export default function AddCaseScreen() {
               style={styles.input}
               value={formData.adversePartyAdvocateName}
               onChangeText={(value) =>
-                handleInputChange('adversePartyAdvocateName', value)
+                handleInputChange("adversePartyAdvocateName", value)
               }
               placeholder="Enter adverse party advocate"
+              placeholderTextColor={Colors.text.tertiary}
             />
           </View>
 
@@ -311,11 +350,12 @@ export default function AddCaseScreen() {
             <TextInput
               style={[styles.input, styles.textArea]}
               value={formData.description}
-              onChangeText={(value) => handleInputChange('description', value)}
+              onChangeText={(value) => handleInputChange("description", value)}
               placeholder="Enter case description"
               multiline
               numberOfLines={4}
               textAlignVertical="top"
+              placeholderTextColor={Colors.text.tertiary}
             />
           </View>
         </View>
@@ -343,98 +383,102 @@ export default function AddCaseScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: Colors.background.secondary,
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingTop: 60,
-    paddingBottom: 20,
-    backgroundColor: '#fff',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: Spacing.lg,
+    paddingTop: Spacing.xxxl + 20,
+    paddingBottom: Spacing.lg,
+    backgroundColor: Colors.background.primary,
     borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
+    borderBottomColor: Colors.neutral[200],
   },
   backBtn: {
-    padding: 8,
+    padding: Spacing.xs,
   },
   headerTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#333',
+    fontSize: Typography.fontSize.xl,
+    fontWeight: Typography.fontWeight.bold,
+    color: Colors.text.primary,
   },
   scrollView: {
     flex: 1,
   },
   contentContainer: {
-    padding: 20,
+    padding: Spacing.lg,
     paddingBottom: 40,
   },
   section: {
-    marginBottom: 24,
+    marginBottom: Spacing.xl,
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 16,
+    fontSize: Typography.fontSize.lg,
+    fontWeight: Typography.fontWeight.bold,
+    color: Colors.text.primary,
+    marginBottom: Spacing.md,
   },
   inputGroup: {
-    marginBottom: 16,
+    marginBottom: Spacing.md,
   },
   label: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#666',
-    marginBottom: 8,
+    fontSize: Typography.fontSize.sm,
+    fontWeight: Typography.fontWeight.medium,
+    color: Colors.text.secondary,
+    marginBottom: Spacing.xs,
   },
   input: {
-    backgroundColor: '#fff',
+    backgroundColor: Colors.background.primary,
     borderWidth: 1,
-    borderColor: '#e0e0e0',
-    borderRadius: 8,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    fontSize: 16,
+    borderColor: Colors.neutral[200],
+    borderRadius: BorderRadius.md,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
+    fontSize: Typography.fontSize.md,
+    color: "#000",
+    ...Shadows.sm,
   },
   textArea: {
     minHeight: 100,
   },
   pickerContainer: {
-    backgroundColor: '#fff',
+    backgroundColor: Colors.background.primary,
     borderWidth: 1,
-    borderColor: '#e0e0e0',
-    borderRadius: 8,
-    /* removed overflow: 'hidden' to avoid clipping Android dropdown menus */
+    borderColor: Colors.neutral[200],
+    borderRadius: BorderRadius.md,
+    ...Shadows.sm,
   },
   picker: {
     height: 50,
-    width: '100%',
+    width: "100%",
+    color: "#000",
   },
   row: {
-    flexDirection: 'row',
-    gap: 12,
+    flexDirection: "row",
+    gap: Spacing.sm,
   },
   flex1: {
     flex: 1,
   },
   submitBtn: {
-    backgroundColor: '#8b7355',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 16,
-    borderRadius: 12,
-    gap: 8,
-    marginTop: 24,
+    backgroundColor: Colors.primary[500],
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: Spacing.md,
+    borderRadius: BorderRadius.lg,
+    gap: Spacing.xs,
+    marginTop: Spacing.lg,
+    ...Shadows.md,
   },
   submitBtnDisabled: {
     opacity: 0.6,
   },
   submitBtnText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
+    color: "#fff",
+    fontSize: Typography.fontSize.md,
+    fontWeight: Typography.fontWeight.semibold,
   },
 });

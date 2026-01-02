@@ -1,4 +1,4 @@
-// app/(tabs)/index.tsx - Modern Dashboard Screen with Real Data
+// app/(tabs)/index.tsx - Updated Dashboard with disposed status
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import {
   View,
@@ -46,7 +46,7 @@ interface DashboardStats {
   thisWeek: number;
   pending: number;
   hearing: number;
-  completed: number;
+  disposed: number;
 }
 
 interface UpcomingHearing {
@@ -87,7 +87,7 @@ export default function HomeScreen() {
     thisWeek: 0,
     pending: 0,
     hearing: 0,
-    completed: 0,
+    disposed: 0,
   });
   const [upcomingHearings, setUpcomingHearings] = useState<UpcomingHearing[]>(
     []
@@ -160,7 +160,7 @@ export default function HomeScreen() {
 
   const getActivityIcon = (type: string) => {
     switch (type) {
-      case "completed":
+      case "disposed":
         return CheckCircle;
       case "hearing":
         return Scale;
@@ -173,7 +173,7 @@ export default function HomeScreen() {
 
   const getActivityColor = (type: string) => {
     switch (type) {
-      case "completed":
+      case "disposed":
         return Colors.success.main;
       case "hearing":
         return Colors.info.main;
@@ -437,7 +437,7 @@ export default function HomeScreen() {
             title="Calendar"
             subtitle={`${stats.hearing} hearings`}
             gradient={[Colors.warning.main, Colors.warning.dark]}
-            onPress={() => router.push("/cases" as any)}
+            onPress={() => router.push("/calendar" as any)}
           />
           <QuickAction
             icon={FileText}

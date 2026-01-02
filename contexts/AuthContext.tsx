@@ -1,6 +1,6 @@
-// contexts/AuthContext.tsx - FINAL WORKING VERSION
+// contexts/AuthContext.tsx - AGGRESSIVE LOGOUT FIX
 import React, { createContext, useState, useContext, useEffect } from "react";
-import { useRouter, useSegments, usePathname } from "expo-router";
+import { useRouter, useSegments } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { authAPI } from "../services/api";
 
@@ -16,7 +16,7 @@ interface AuthContextType {
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (name: string, email: string, password: string) => Promise<void>;
-  logout: () => Promise<void>;
+  logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -24,7 +24,7 @@ const AuthContext = createContext<AuthContextType>({
   loading: true,
   login: async () => {},
   register: async () => {},
-  logout: async () => {},
+  logout: () => {},
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -32,22 +32,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
   const segments = useSegments();
-  const pathname = usePathname();
 
-  // Check if user is logged in on app start
   useEffect(() => {
     loadUser();
   }, []);
 
-  // Handle navigation based on auth state
   useEffect(() => {
     if (loading) return;
 
     const inTabsGroup = segments[0] === "(tabs)";
 
-    // Only protect dashboard routes
     if (!user && inTabsGroup) {
-      console.log("✅ Auth: Redirecting logged out user to landing page");
+      console.log("🔴 User logged out, forcing redirect to /");
       router.replace("/");
     }
   }, [user, loading, segments]);
@@ -79,11 +75,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (response.success && response.token) {
         await SecureStore.setItemAsync("token", response.token);
         setUser(response.user);
-
-        // Navigate to dashboard after small delay
-        setTimeout(() => {
-          router.replace("/(tabs)");
-        }, 100);
+        router.replace("/(tabs)");
       } else {
         throw new Error(response.message || "Login failed");
       }
@@ -102,11 +94,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (response.success && response.token) {
         await SecureStore.setItemAsync("token", response.token);
         setUser(response.user);
-
-        // Navigate to dashboard after small delay
-        setTimeout(() => {
-          router.replace("/(tabs)");
-        }, 100);
+        router.replace("/(tabs)");
       } else {
         throw new Error(response.message || "Registration failed");
       }
@@ -118,31 +106,37 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const logout = async () => {
-    try {
-      console.log("🔴 Starting logout...");
+  const logout = () => {
+    console.log("🔴🔴🔴 LOGOUT CALLED 🔴🔴🔴");
 
-      // Step 1: Clear token from secure storage
-      await SecureStore.deleteItemAsync("token");
-      console.log("🔴 Token cleared from storage");
+    // IMMEDIATE synchronous clear
+    setUser(null);
+    console.log("🔴 User state set to null");
 
-      // Step 2: Clear user state
-      setUser(null);
-      console.log("🔴 User state cleared");
+    // Clear token asynchronously but don't wait
+    SecureStore.deleteItemAsync("token")
+      .then(() => console.log("🔴 Token deleted"))
+      .catch((e) => console.log("🔴 Token delete error:", e));
 
-      // Step 3: Wait a bit for state to update, then navigate
-      setTimeout(() => {
-        console.log("🔴 Navigating to landing page");
-        router.replace("/");
-      }, 100);
+    // FORCE navigation immediately - try multiple methods
+    console.log("🔴 Attempting navigation to /");
 
-      console.log("🔴 Logout complete!");
-    } catch (error) {
-      console.error("🔴 Logout error:", error);
-      // Force logout anyway
-      setUser(null);
+    // Method 1: Direct replace
+    router.replace("/");
+
+    // Method 2: Push as backup (in case replace doesn't work)
+    setTimeout(() => {
+      console.log("🔴 Backup navigation attempt");
+      router.push("/");
+    }, 50);
+
+    // Method 3: Nuclear option - navigate to root
+    setTimeout(() => {
+      console.log("🔴 Nuclear navigation attempt");
       router.replace("/");
-    }
+    }, 100);
+
+    console.log("🔴🔴🔴 LOGOUT FUNCTION COMPLETED 🔴🔴🔴");
   };
 
   return (

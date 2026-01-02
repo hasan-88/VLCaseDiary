@@ -8,11 +8,20 @@
     "scheme": "vlcasediary",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/images/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#8b7355"
+    },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.hasanzafar.VLCaseDiary",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+         "NSCameraUsageDescription": "Voice of Law needs access to your camera to capture photos of documents and evidence for your cases.",
+        "NSPhotoLibraryUsageDescription": "Voice of Law needs access to your photo library to upload documents and images for your cases.",
+        "NSCalendarsUsageDescription": "Voice of Law needs access to your calendar to display and sync case hearing dates.",
+        "NSRemindersUsageDescription": "Voice of Law needs access to reminders to create case hearing reminders."
       }
     },
     "android": {
@@ -22,6 +31,18 @@
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
+      "permissions": [
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "READ_CALENDAR",
+        "WRITE_CALENDAR",
+        "RECEIVE_BOOT_COMPLETED",
+        "VIBRATE",
+        "WAKE_LOCK",
+        "USE_FULL_SCREEN_INTENT",
+        "POST_NOTIFICATIONS"
+      ],
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
       "package": "com.hasanzafar.VLCaseDiary"
@@ -42,6 +63,27 @@
           "dark": {
             "backgroundColor": "#000000"
           }
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/notification-icon.png",
+          "color": "#8b7355",
+          "sounds": ["./assets/sounds/notification.wav"]
+        }
+      ],
+      [
+        "expo-calendar",
+        {
+          "calendarPermission": "Voice of Law needs to access your calendar to display case hearing dates."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Voice of Law needs access to your photos to upload documents for your cases.",
+          "cameraPermission": "Voice of Law needs access to your camera to capture photos of documents and evidence."
         }
       ],
       "expo-secure-store"

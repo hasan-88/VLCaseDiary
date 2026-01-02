@@ -4,7 +4,7 @@ import * as ImagePicker from "expo-image-picker";
 import * as SecureStore from "expo-secure-store";
 
 // API configuration - UPDATE THIS WITH YOUR SERVER IP
-const API_URL = "http://192.168.100.201:5000/api";
+const API_URL = "http://192.168.43.165:5000/api";
 
 const api = axios.create({
   baseURL: API_URL,

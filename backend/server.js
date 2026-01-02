@@ -266,6 +266,11 @@ app.get("/api/auth/profile", authMiddleware, async (req, res) => {
 // ==================== DASHBOARD ROUTES ====================
 
 // Get dashboard statistics
+// server.js - Dashboard routes updated (replace the dashboard section)
+
+// ==================== DASHBOARD ROUTES ====================
+
+// Get dashboard statistics
 app.get("/api/dashboard/stats", authMiddleware, async (req, res) => {
   try {
     const userId = req.user.id;
@@ -296,9 +301,9 @@ app.get("/api/dashboard/stats", authMiddleware, async (req, res) => {
       userId,
       status: "hearing",
     });
-    const completedCases = await Case.countDocuments({
+    const disposedCases = await Case.countDocuments({
       userId,
-      status: "completed",
+      status: "disposed",
     });
 
     res.json({
@@ -309,7 +314,7 @@ app.get("/api/dashboard/stats", authMiddleware, async (req, res) => {
         thisWeek: thisWeekCases,
         pending: pendingCases,
         hearing: hearingCases,
-        completed: completedCases,
+        disposed: disposedCases,
       },
     });
   } catch (error) {
@@ -377,8 +382,8 @@ app.get("/api/dashboard/activity", authMiddleware, async (req, res) => {
         case "hearing":
           actionText = "Case status updated to hearing";
           break;
-        case "completed":
-          actionText = "Case marked as completed";
+        case "disposed":
+          actionText = "Case marked as disposed";
           break;
         default:
           actionText = "Case updated";
@@ -414,10 +419,10 @@ app.get("/api/dashboard/metrics", authMiddleware, async (req, res) => {
     startOfMonth.setDate(1);
     startOfMonth.setHours(0, 0, 0, 0);
 
-    // Cases won this month (completed)
+    // Cases won this month (disposed)
     const casesWon = await Case.countDocuments({
       userId,
-      status: "completed",
+      status: "disposed",
       updatedAt: { $gte: startOfMonth },
     });
 
@@ -450,6 +455,44 @@ app.get("/api/dashboard/metrics", authMiddleware, async (req, res) => {
   }
 });
 
+// Update case status route
+app.patch("/api/cases/:id/status", authMiddleware, async (req, res) => {
+  try {
+    const { status } = req.body;
+
+    if (!["pending", "disposed", "hearing"].includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid status",
+      });
+    }
+
+    const caseItem = await Case.findOneAndUpdate(
+      { _id: req.params.id, userId: req.user.id },
+      { status },
+      { new: true }
+    );
+
+    if (!caseItem) {
+      return res.status(404).json({
+        success: false,
+        message: "Case not found",
+      });
+    }
+
+    res.json({
+      success: true,
+      message: "Case status updated successfully",
+      data: caseItem,
+    });
+  } catch (error) {
+    console.error("Update case status error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error updating case status",
+    });
+  }
+});
 // ==================== CASE MANAGEMENT ROUTES ====================
 
 // Search cases
